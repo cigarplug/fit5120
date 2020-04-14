@@ -1,0 +1,35 @@
+from matplotlib import pyplot as plt
+import pandas as pd
+from image_to_bytes import img_bytes
+
+
+def age_sex_stats(con, query):
+
+	# read sql
+    df = pd.read_sql_query(query, con)
+    
+    # remove unknown sex and age groups
+    df = df[ (df["age_group"] != "unknown") & (df["sex"] != "U")]
+    
+    # set order for age groups
+    df["age_group"] = pd.Categorical(df["age_group"],
+                                 categories=["0-4", "5-12", "13-15", "16-17", "17-21", 
+                                             "22-25", "26-29", "30-39", "40-49",
+                                             "50-59", "60-64", "64-69", "70+"], 
+                                 ordered=True)
+    
+    # sort df by above defined order
+    df.sort_values(["age_group"]).reset_index(inplace=True)
+    
+    # create the pivot plot
+    # plt.figure(figsize = (16,9))
+    df.pivot("age_group", "sex", "crashes").plot(kind='bar', width = 0.8)
+
+    # set plot params: labels, font, and sizes
+    plt.xticks(fontsize = 12)
+    plt.yticks(fontsize = 12)
+    plt.xlabel("age group", fontsize = 15)
+    plt.ylabel("no. of crashes", fontsize = 15)
+    plt.suptitle("Accident stats by age and sex (5 kms radius)", fontsize = 18)
+
+    return img_bytes(plt)

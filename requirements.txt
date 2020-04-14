@@ -1,0 +1,14 @@
+gunicorn
+click==7.1.1
+dnspython==1.16.0
+Flask==1.1.2
+itsdangerous==1.1.0
+Jinja2==2.11.1
+MarkupSafe==1.1.1
+mysql-connector-python==8.0.19
+protobuf==3.6.1
+six==1.14.0
+Werkzeug==1.0.1
+matplotlib==3.2.0
+numpy==1.18.1
+pandas==1.0.3

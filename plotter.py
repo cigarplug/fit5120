@@ -3,10 +3,7 @@ import pandas as pd
 from image_to_bytes import img_bytes
 
 
-def age_sex_stats(con, query):
-
-	# read sql
-    df = pd.read_sql_query(query, con)
+def age_sex_stats(df):
     
     # remove unknown sex and age groups
     df = df[ (df["age_group"] != "unknown") & (df["sex"] != "U")]

@@ -1,6 +1,7 @@
 import mysql.connector
 from flask import jsonify
 import os
+import pandas as pd
 import plotter
 from datetime import datetime
 
@@ -66,8 +67,9 @@ class api:
 	    group by p.sex, p.age_group
 	    """)
 	    
+	    df = pd.read_sql_query(query, self.cnx)
 
-	    return plotter.age_sex_stats(self.cnx, query)
+	    return plotter.age_sex_stats(df)
 
 
 	def save_pvt(self, reaction_times, test_times):

@@ -46,7 +46,7 @@ def pvt():
 	rt = content["reaction_times"]
 	tt = content["test_times"]
 
-	if(len(rt) == len(tt) and len(rt) > 0):
+	if(len(rt) == len(tt)):
 		return(api().save_pvt(rt, tt))
 	else:
 		return(jsonify({"res": "invalid data"}))

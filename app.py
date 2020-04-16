@@ -24,7 +24,7 @@ def home():
 
 
 @app.route('/local_crashes_person', methods=[ 'GET', "POST"])
-def person_age_sex():
+def local_crashes_person():
 	content = request.json
 
 	# extract lat and lon
@@ -41,7 +41,7 @@ def person_age_sex():
 
 
 @app.route("/pvt_data", methods = ["POST"])
-def pvt():
+def pvt_data():
 	content = request.json
 	rt = content["reaction_times"]
 	tt = content["test_times"]

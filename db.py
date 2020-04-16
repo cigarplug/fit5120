@@ -3,7 +3,7 @@ from flask import jsonify
 import os
 import pandas as pd
 import plotter
-from tzinfo import now
+from tzinfo import melb_now
 
 
 class api:
@@ -75,7 +75,7 @@ class api:
 	def save_pvt(self, reaction_times, test_times):
 
 		# get current date and time
-	    now = now()
+	    now = melb_now()
 
 	    # create database cursor object
 	    cursor = self.cnx.cursor()

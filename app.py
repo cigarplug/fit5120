@@ -48,7 +48,7 @@ def pvt_data():
 	fc = content["false_clicks"]
 
 	if(len(rt) == len(tt)):
-		return(api().save_pvt(rt, tt, fk))
+		return(api().save_pvt(rt, tt, fc))
 	else:
 		return(jsonify({"res": "invalid data"}))
 

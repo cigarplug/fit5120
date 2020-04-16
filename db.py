@@ -71,7 +71,7 @@ class api:
 	    return plotter.age_sex_stats(df)
 
 
-	def save_pvt(self, reaction_times, test_times):
+	def save_pvt(self, reaction_times, test_times, false_clicks):
 
 		# get current date and time
 	    now = melb_now()
@@ -80,10 +80,11 @@ class api:
 	    cursor = self.cnx.cursor()
 
 	    query = ("""
-	    insert into pvt (`timestamp` , test_time , reaction_time ) values ('
+	    insert into pvt (`timestamp` , test_time , reaction_time, false_clicks ) values ('
 	    """ + str(now) + """', '{"times":
 	    """ + str(test_times) + """}', '{"times":
-	    """ + str(reaction_times) + """}' )
+	    """ + str(reaction_times) + """}', '
+	    """ + str(false_clicks) + """ ')
 	    """
 	    )
 

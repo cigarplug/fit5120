@@ -45,9 +45,10 @@ def pvt_data():
 	content = request.json
 	rt = content["reaction_times"]
 	tt = content["test_times"]
+	fc = content["false clicks"]
 
 	if(len(rt) == len(tt)):
-		return(api().save_pvt(rt, tt))
+		return(api().save_pvt(rt, tt, fk))
 	else:
 		return(jsonify({"res": "invalid data"}))
 

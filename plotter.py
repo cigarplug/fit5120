@@ -30,3 +30,34 @@ def age_sex_stats(df):
     plt.suptitle("Accident stats by age and sex (5 kms radius)", fontsize = 18)
 
     return img_bytes(plt)
+
+
+
+def tod_atm_stats(df):
+    
+    # remove rows where weather is unknown
+    df = df[df["atm"] != "Not known"]
+
+    # reset indices
+    df.reset_index(inplace = True)
+
+    # x ticks -- every 4th element from data aggregated by 30 mins, ie plot tick for every 2nd hour
+    x = [x for x in range(0,24,2)]   
+        
+    
+    # create the pivot plot
+    df.pivot("tod", "atm", "crashes").plot(kind = "line")
+
+    # set plot params: labels, font, legend, and sizes
+    plt.xticks( fontsize = 12)
+    plt.yticks(fontsize = 12)
+    plt.xlabel("Time of day", fontsize = 15)
+    plt.ylabel("no. of crashes", fontsize = 15)
+    plt.suptitle("Crashes: time of day and atmospheric condition", fontsize = 16)
+    plt.legend(loc = "center right", ncol=1, 
+               fancybox=True, shadow=True, 
+               bbox_to_anchor=(1.4, 0.5),
+               prop={'size': 12}
+              )
+
+    return img_bytes(plt)

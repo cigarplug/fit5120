@@ -18,39 +18,38 @@ class api:
 		self.lon = lon
 		self.age = age
 		self.sex = sex
+		self.kms = 5
 
 
 
-	def get_crash_stats(self, kms = 3, min_count = 10):
+	def crash_tod_atm(self):
 
-		cursor = self.cnx.cursor()
-		
 		query = ("""
+	    SELECT
+	        sec_to_time(time_to_sec(a.accidentdate)- time_to_sec(a.accidentdate)%(30 * 60)) as tod,
+	        ac.atmosph_cond_desc atm,
+	        count(*) crashes
+	    from
+	    node n
+	    left join accident a on
+	        n.accident_no = a.accident_no
+	    left join atmospheric_cond ac on
+	        ac.accident_no = n.accident_no
+	    where
+	        ST_Distance_Sphere(Point(""" + str(self.lon) + ", " + str(self.lat) + "), n.coords) < " + str(self.kms*1000) + 
+	    """
+	    group by
+	        tod,
+	        atm
+	    """)
 
-			select
-				al.road_name,
-				count(*) accident_count
-			from
-				node n
-			left join accident_location al on
-				n.accident_no = al.accident_no
-			where
-				ST_Distance_Sphere(Point(""" + str(self.lon) + ", " + str(self.lat) + "), n.coords) < " + str(kms*1000) + 
-			"""
-			GROUP by al.road_name 
-			having accident_count >= """ + str(min_count)
+		df = pd.read_sql_query(query, self.cnx)
 
-			)
-
-		cursor.execute(query)
-		df = cursor.fetchall()
-
-		cursor.close()
-
-		return(jsonify(df))
+		return plotter.tod_atm_stats(df)
 
 
-	def crash_by_person(self, kms = 5):
+
+	def crash_by_person(self):
     
 	    query = ("""
 	    select
@@ -59,10 +58,10 @@ class api:
 	        count(*) crashes    
 	    from
 	        node n   
-	    left join person p
-	    on p.accident_no  = n.accident_no
+	    left join person p on 
+	    	p.accident_no  = n.accident_no
 	    where
-	        ST_Distance_Sphere(Point(""" + str(self.lon) + ", " + str(self.lat) + "), n.coords) < " + str(kms*1000) + 
+	        ST_Distance_Sphere(Point(""" + str(self.lon) + ", " + str(self.lat) + "), n.coords) < " + str(self.kms*1000) + 
 	    """    
 	    group by p.sex, p.age_group
 	    """)

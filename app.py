@@ -11,15 +11,15 @@ app.config["DEBUG"] = True
 
 
 
-@app.route('/crash_stats', methods=[ 'POST'])
-def home():
+@app.route('/crashes_tod_atm', methods=[ 'POST'])
+def crashes_tod_atm():
 	content = request.json
 	lat = float(content["lat"])
 	lon = float(content["lon"])
 	# kms = float(content["kms"])
 
-	allah = api( lat, lon)
-	return allah.get_crash_stats()
+	tod_atm = api( lat, lon).crash_tod_atm()
+	return send_file(tod_atm, attachment_filename='plot.png', mimetype='image/png')
  
 
 

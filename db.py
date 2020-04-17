@@ -83,8 +83,7 @@ class api:
 	    insert into pvt (`timestamp` , test_time , reaction_time, false_clicks ) values ('
 	    """ + str(now) + """', '{"times":
 	    """ + str(test_times) + """}', '{"times":
-	    """ + str(reaction_times) + """}', '
-	    """ + str(false_clicks) + """ ')
+	    """ + str(reaction_times) + """}', '""" + str(false_clicks) + """')
 	    """
 	    )
 

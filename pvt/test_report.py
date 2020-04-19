@@ -7,15 +7,15 @@ import numpy as np
 class report:
 
 	def __init__(self, response_times, test_times, false_clicks = 0):
-		self.response_times = np.multiply(response_times, 1000)
+		self.response_times = response_times
 		self.test_times = test_times
 		self.false_clicks = false_clicks
-		self.mean_rt = mean(self.response_times)
+		
 
 
 	def star_rate(self):
     
-	    mean_rt = self.mean_rt
+	    mean_rt = no.mean(np.multiply(response_times, 1000))
 	    false_clicks = self.false_clicks
 	    
 	    if mean_rt < 300:
@@ -45,7 +45,7 @@ class report:
 	            comment = ("Your test results indicate that you have somewhat quick response times " +
 	                       "and none to very few false clicks."
 	                      )
-	            fatigue_level = "Mild"
+	            fatigue_level = "Relatively Low"
 	        elif 2 < false_clicks <= 4:
 	            rating = 3.5
 	            comment = ("Your test results indicate that you have somewhat quick response times " +

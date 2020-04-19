@@ -41,6 +41,8 @@ def tod_atm_stats(df):
 
     # reset indices
     df.reset_index(inplace = True)
+
+    # convert hh::mm::ss to hours (interval of 30 mins as per sql query )
     df["tod"] = df["tod"].apply(lambda x: x / np.timedelta64(1, "h"))
 
 
@@ -80,7 +82,7 @@ def response_time_chart(response_times, test_times):
     # cumulate sum of each element in testsum list for plotting on x-axis
     resp = np.cumsum(testsums)
 
-    #plot the bar
+    #plot the bar graph
 
     plt.bar(resp, ms)
 

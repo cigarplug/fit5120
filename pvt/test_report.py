@@ -22,80 +22,82 @@ class report:
 	        if false_clicks <= 2:
 	            rating = 5
 	            comment = ("Your test results indicate that you have extremely quick response times " +
-	                      "and none to very few false clicks. "+
-	                       "This means that your level of fatigue is very low"
+	                      "and none to very few false clicks."
 	                      )
+	            fatigue_level = "Very low"
 	        elif 2 < false_clicks <= 5:
 	            rating = 4
 	            comment = ("Your test results indicate that you have extremely quick response times " +
-	                      "with moderate number of false clicks. " +
-	                       "This means that your level fatigue is low."
+	                      "with moderate number of false clicks. "
 	                      )
+	            fatigue_level = "Low"
 	        else:
 	            rating = 3.5
 	            comment = ("Your test results indicate that you have extremely quick response times " +
 	                      "but fairly high number of false clicks. " +
-	                       "This means that you level fatigue is low. " +
 	                       "The high number of false clicks may be a sign of hyperactivity."
 	                      )
+	            fatigue_level = "Low"
 	    
 	    elif 300 < mean_rt <= 500:
 	        if false_clicks <=2 :
 	            rating = 4
 	            comment = ("Your test results indicate that you have somewhat quick response times " +
-	                       "and none to very few false clicks. "+
-	                       "This means that you level of fatigue is mild."
+	                       "and none to very few false clicks."
 	                      )
+	            fatigue_level = "Mild"
 	        elif 2 < false_clicks <= 4:
 	            rating = 3.5
 	            comment = ("Your test results indicate that you have somewhat quick response times " +
-	                      "with a few number of false clicks. " +
-	                       "This means that your level of fatigue is mild to moderate"
+	                      "with a few number of false clicks."
 	                      )
+	            fatigue_level = "Mild to moderate"
 	        else:
 	            rating = 3
 	            comment = ("Your test results indicate that you have somewhat quick response times " +
-	                      "with high number of false clicks. " +
-	                       "This means that your level of fatigue is moderate"
+	                      "with high number of false clicks."
 	                      )
+	            fatigue_level = "Moderate"
 	    
 	    elif 500 < mean_rt <= 700:
 	        if false_clicks <= 2:
 	            rating = 3
 	            comment = ("Your test results indicate that you have relatively slow response times " +
-	                      "and none to very few false clicks. " +
-	                       "This means that your level of fatigue is significant"
+	                      "and none to very few false clicks."
 	                      )
+	            fatigue_level = "Significant"
 	        elif 2 < false_clicks <= 5:
 	            rating = 2.5
 	            comment = ("Your test results indicate that you have relatively slow response times " +
-	                      "with a few number of false clicks. " +
-	                       "This means that your level of fatigue is significant"
+	                      "with a few number of false clicks."
 	                      )
+	            fatigue_level = "Significant"
 	        else:
 	            rating = 2
 	            comment = ("Your test results indicate that you have relatively slow response times " +
-	                      "with high number of false clicks. " +
-	                       "This means that your level of fatigue is significantly high"
+	                      "with high number of false clicks."
 	                      )
+	            fatigue_level = "Significantly high"
 	    
 	    elif 700 < mean_rt <= 1000:
-	        comment = ("Your test results indicate that you have significantly slow response times. " +
-	                       "This means that your level of fatigue is excessive"
-	                      )
+	        comment = ("Your test results indicate that you have significantly slow response times.")
+	        
 	        if false_clicks <= 2:
 	            rating = 2
+	            fatigue_level = "High"
 	        else:
 	            rating = 1.5
+	            fatigue_level = "Excessive"
 	            
 	    elif 1000 < mean_rt:
-	        comment = ("Your test results indicate that you have extremely slow response times. " +
-	                       "This means that your level of fatigue is excessive"
-	                      )
+	        comment = ("Your test results indicate that you have extremely slow response times."
+	                  )
 	        rating = 1
+	        fatigue_level = "Excessive"
 	        
 	              
-	    return (jsonify({"rating": rating, "comment": comment}))
+	    return (jsonify({"rating": rating, "comment": comment, "fatigue_level": fatigue_level}))
+	            
 
 
 	def chart_times(self):

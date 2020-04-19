@@ -41,6 +41,8 @@ def tod_atm_stats(df):
 
     # reset indices
     df.reset_index(inplace = True)
+    df["tod"] = df["tod"].apply(lambda x: x / np.timedelta64(1, "h"))
+
 
     # x ticks -- every 4th element from data aggregated by 30 mins, ie plot tick for every 2nd hour
     x = [x for x in range(0,24,2)]   
@@ -50,7 +52,7 @@ def tod_atm_stats(df):
     df.pivot("tod", "atm", "crashes").plot(kind = "line")
 
     # set plot params: labels, font, legend, and sizes
-    plt.xticks( fontsize = 12)
+    plt.xticks(x, [str(x)+":00" for x in x], fontsize = 12, rotation="90")
     plt.yticks(fontsize = 12)
     plt.xlabel("Time of day", fontsize = 15)
     plt.ylabel("no. of crashes", fontsize = 15)

@@ -47,6 +47,11 @@ def pvt_data(type):
 	false_clicks = content["false_clicks"]
 
 	if(len(reaction_times) == len(test_times)):
+
+		# save to db (temp ops)
+
+		api().save_pvt(reaction_times, test_times, false_clicks)
+
 		reporter = report(reaction_times, test_times, false_clicks)
 		if type == "summary":
 			return reporter.star_rate()

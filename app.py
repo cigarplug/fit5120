@@ -2,8 +2,7 @@ from flask import Flask, request, send_file, jsonify
 from db import api
 import mysql.connector
 import os
-from numpy import mean, median
-
+from pvt.test_report import report
 
 
 app = Flask(__name__)
@@ -43,12 +42,14 @@ def local_crashes_person():
 @app.route("/pvt_data", methods = ["POST"])
 def pvt_data():
 	content = request.json
-	rt = content["reaction_times"]
-	tt = content["test_times"]
-	fc = content["false_clicks"]
+	reaction_times = content["reaction_times"]
+	test_times = content["test_times"]
+	false_clicks = content["false_clicks"]
 
-	if(len(rt) == len(tt)):
-		return(api().save_pvt(rt, tt, fc))
+	if(len(reaction_times) == len(test_times)):
+		reporter = report(reaction_times, test_times, false_clicks)
+		return reporter.star_rate()
+
 	else:
 		return(jsonify({"res": "invalid data"}))
 

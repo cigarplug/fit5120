@@ -11,3 +11,4 @@ fmt = "%Y-%m-%d %H:%M:%S"
 
 def melb_now():
 	return(utc_now.astimezone(melb).strftime(fmt))
+

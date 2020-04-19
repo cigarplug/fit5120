@@ -39,8 +39,8 @@ def local_crashes_person():
 
 
 
-@app.route("/pvt_data", methods = ["POST"])
-def pvt_data():
+@app.route("/pvt_data/<type>", methods = ["POST"])
+def pvt_data(type):
 	content = request.json
 	reaction_times = content["reaction_times"]
 	test_times = content["test_times"]
@@ -48,7 +48,10 @@ def pvt_data():
 
 	if(len(reaction_times) == len(test_times)):
 		reporter = report(reaction_times, test_times, false_clicks)
-		return reporter.star_rate()
+		if type == "summary":
+			return reporter.star_rate()
+		elif type == "chart":
+			return send_file(reporter.chart_times(), attachment_filename='plot.png', mimetype='image/png')
 
 	else:
 		return(jsonify({"res": "invalid data"}))

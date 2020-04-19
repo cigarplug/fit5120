@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import pandas as pd
 from image_to_bytes import img_bytes
+import numpy as np
 
 
 def age_sex_stats(df):
@@ -61,3 +62,22 @@ def tod_atm_stats(df):
               )
 
     return img_bytes(plt)
+
+
+def response_time_chart(response_times, test_times):
+
+    ms = np.multiply(response_times, 1000)
+    resp = np.cumsum(response_times)
+
+    xt = np.arange(np.sum(test_times))[::5]
+
+    xt_labs = np.arange(len(xt))
+    plt.bar(resp, ms, width=0.15)
+    plt.xticks(xt_labs, xt)
+
+    plt.xlabel("Test Timeline (s)", fontsize = 15)
+    plt.ylabel("Response Times (ms)", fontsize = 15)
+    plt.suptitle("Your Test Data Visualised", fontsize = 16)
+
+    return img_bytes(plt)
+

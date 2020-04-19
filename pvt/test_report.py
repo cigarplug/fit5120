@@ -1,5 +1,7 @@
 from numpy import mean
 from flask import jsonify
+from plotter import response_time_chart
+
 
 class report:
 
@@ -93,6 +95,11 @@ class report:
 	        
 	              
 	    return (jsonify({"rating": rating, "comment": comment}))
+
+
+	def chart_times(self):
+		return response_time_chart(self.response_times, self.test_times)
+
             
             
             

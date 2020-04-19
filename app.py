@@ -52,11 +52,15 @@ def pvt_data(type):
 
 		api().save_pvt(reaction_times, test_times, false_clicks)
 
+		# create a report class object
 		reporter = report(reaction_times, test_times, false_clicks)
+
+		# execute the requested method
 		if type == "summary":
 			return reporter.star_rate()
 		elif type == "chart":
-			return send_file(reporter.chart_times(), attachment_filename='plot.png', mimetype='image/png')
+			plot = reporter.chart_times()
+			return send_file(plot, attachment_filename='plot.png', mimetype='image/png')
 
 	else:
 		return(jsonify({"res": "invalid data"}))

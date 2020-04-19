@@ -66,15 +66,23 @@ def tod_atm_stats(df):
 
 def response_time_chart(response_times, test_times):
 
+    # courtesy: https://stackoverflow.com/questions/11280536/how-can-i-add-the-corresponding-elements-of-several-lists-of-numbers
+    # add test time and response time for each click
+    # example: reaction time is 10s and wait time is 8 s, then next plot bar should be add +18s on x-axis
+
+    testsums = [sum(n) for n in zip(*[response_times, test_times])]
+    
+    # seconds to ms
     ms = np.multiply(response_times, 1000)
-    resp = np.cumsum(response_times)
 
-    xt = np.arange(np.sum(test_times))[::5]
+    # cumulate sum of each element in testsum list for plotting on x-axis
+    resp = np.cumsum(testsums)
 
-    xt_labs = np.arange(len(xt))
-    plt.bar(resp, ms, width=0.15)
-    plt.xticks(xt_labs, xt)
+    #plot the bar
 
+    plt.bar(resp, ms)
+
+    # set plot params: labels, font, and sizes
     plt.xlabel("Test Timeline (s)", fontsize = 15)
     plt.ylabel("Response Times (ms)", fontsize = 15)
     plt.suptitle("Your Test Data Visualised", fontsize = 16)

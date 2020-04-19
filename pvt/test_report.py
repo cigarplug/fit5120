@@ -1,15 +1,16 @@
 from numpy import mean
 from flask import jsonify
 from plotter import response_time_chart
+import numpy as np
 
 
 class report:
 
 	def __init__(self, response_times, test_times, false_clicks = 0):
-		self.response_times = response_times
+		self.response_times = np.multiply(response_times, 1000)
 		self.test_times = test_times
 		self.false_clicks = false_clicks
-		self.mean_rt = mean(response_times)
+		self.mean_rt = mean(self.response_times)
 
 
 	def star_rate(self):

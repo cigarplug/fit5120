@@ -82,14 +82,16 @@ def response_time_chart(response_times, test_times):
     # cumulate sum of each element in testsum list for plotting on x-axis
     resp = np.cumsum(testsums)
 
-    #plot the bar graph
+    #plot the bar
+    
+    fig, ax = plt.subplots()
 
-    plt.bar(resp, ms)
+    ax.bar(resp, ms)
 
     # set plot params: labels, font, and sizes
-    plt.xlabel("Test Timeline (s)", fontsize = 15)
-    plt.ylabel("Response Times (ms)", fontsize = 15)
-    plt.suptitle("Your Test Data Visualised", fontsize = 16)
+    ax.set_xlabel("Test Timeline (s)", fontsize = 15)
+    ax.set_ylabel("Response Times (ms)", fontsize = 15)
+    ax.set_title("Your Test Data Visualised", fontsize = 16)
 
     return img_bytes(plt)
 

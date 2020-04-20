@@ -15,7 +15,7 @@ class report:
 
 	def star_rate(self):
     
-	    mean_rt = no.mean(np.multiply(response_times, 1000))
+	    mean_rt = np.mean(np.multiply(self.response_times, 1000))
 	    false_clicks = self.false_clicks
 	    
 	    if mean_rt < 300:

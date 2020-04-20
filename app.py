@@ -46,7 +46,7 @@ def pvt_data(type):
 	test_times = content["test_times"]
 	false_clicks = content["false_clicks"]
 
-	if(len(reaction_times) == len(test_times)):
+	if(len(reaction_times) == len(test_times) > 0):
 
 		# save to db (temp ops)
 
@@ -62,6 +62,8 @@ def pvt_data(type):
 			plot = reporter.chart_times()
 			return send_file(plot, attachment_filename='plot.png', mimetype='image/png')
 
+	elif (len(reaction_times) == len(test_times) == 0):
+		return(jsonify({"rating": None, "comment": "insufficient data. please re-take the test", "level": None}))
 	else:
 		return(jsonify({"res": "invalid data"}))
 

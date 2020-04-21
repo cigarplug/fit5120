@@ -3,6 +3,7 @@ from db import api
 import mysql.connector
 import os
 from pvt.test_report import report
+import folium
 
 
 app = Flask(__name__)
@@ -66,6 +67,13 @@ def pvt_data(type):
 		return(jsonify({"rating": None, "comment": "insufficient data. please re-take the test", "level": None}))
 	else:
 		return(jsonify({"res": "invalid data"}))
+
+
+@app.route('/map')
+def index():
+    start_coords = (46.9540700, 142.7360300)
+    folium_map = folium.Map(location=start_coords, zoom_start=14)
+    return folium_map._repr_html_()
 
 
 

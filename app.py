@@ -69,7 +69,7 @@ def pvt_data(type):
 		return(jsonify({"res": "invalid data"}))
 
 
-@app.route('/map')
+@app.route('/map', methods = ["GET", "POST"])
 def index():
     start_coords = (46.9540700, 142.7360300)
     folium_map = folium.Map(location=start_coords, zoom_start=14)

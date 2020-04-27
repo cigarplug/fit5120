@@ -1,15 +1,14 @@
-from flask import Flask, request, send_file, jsonify, render_template
+from flask import Flask, request, send_file, jsonify
 from db import api
 import mysql.connector
 import os
 from pvt.test_report import report
-from flask_googlemaps import GoogleMaps, Map
+from maps import gmap
 
 
-app = Flask(__name__, template_folder="maps_template")
+app = Flask(__name__)
 app.config["DEBUG"] = True
-app.config['GOOGLEMAPS_KEY'] = os.environ["gcp_key"]
-GoogleMaps(app)
+
 
 
 
@@ -21,7 +20,6 @@ def crashes_tod_atm():
 		# extract user gps coordinates
 		lat = float(content["lat"])
 		lon	= float(content["lon"])
-		# kms = float(content["kms"])
 
 		# create plot 
 		tod_atm = api( lat, lon).crash_tod_atm()
@@ -36,7 +34,7 @@ def crashes_tod_atm():
  
 
 
-@app.route('/local_crashes_person', methods=[ 'GET', "POST"])
+@app.route('/local_crashes_person', methods=[ "POST"])
 def local_crashes_person():
 	content = request.json
 
@@ -82,35 +80,23 @@ def pvt_data(type):
 		return(jsonify({"res": "invalid data"}))
 
 
-@app.route('/map', methods = ["GET", "POST"])
-def mapview():
-    # creating a map in the view
-    mymap = Map(
-        identifier="view-side",
-        lat=37.4419,
-        lng=-122.1419,
-        markers=[(37.4419, -122.1419)]
-    )
-    sndmap = Map(
-        identifier="sndmap",
-        lat=37.4419,
-        lng=-122.1419,
-        markers=[
-          {
-             'icon': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-             'lat': 37.4419,
-             'lng': -122.1419,
-             'infobox': "<b>Hello World</b>"
-          },
-          {
-             'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-             'lat': 37.4300,
-             'lng': -122.1400,
-             'infobox': "<b>Hello World from other place</b>"
-          }
-        ]
-    )
-    return render_template('example.html', mymap=mymap, sndmap=sndmap)
+
+
+@app.route('/map', methods = [ "POST"])
+def map():
+	content = request.json
+
+	origin = gmap.Place()
+	dest = gmap.Place()
+
+	origin.search(content["origin"]["query"], content["origin"]["qry_type"])
+	dest.search(content["dest"]["query"], content["dest"]["qry_type"])
+
+	my_route = gmap.Directions(origin, dest)
+	my_route.get_route()
+	return(jsonify(my_route.plot_folium()))
+    
+   
     
 
 

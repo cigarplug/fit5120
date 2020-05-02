@@ -2,6 +2,7 @@ import googlemaps
 import os
 import folium
 import polyline
+import numpy as np
 
 
 
@@ -16,8 +17,8 @@ class Place():
 
 	def search(self, query, qry_type):
 		if qry_type == "lat/lon":
-			self.lat = query["lat"]
-			self.lon = query["lon"]
+			self.lat = float(query["lat"])
+			self.lon = float(query["lon"])
 			self.address = "Current Location"
 			
 
@@ -57,8 +58,8 @@ class Directions(Place):
 
 	
 	def plot_folium(self):
-		some_map = folium.Map(location=[-37.8767985, 144.9882031], 
-                              zoom_start=15, tiles='OpenStreetMap')
+		some_map = folium.Map(location=[np.mean([self.origin.lat, self.dest.lat]), np.mean([self.origin.lon, self.dest.lon])],
+										zoom_start=15, tiles='OpenStreetMap')
 
 
 		for each in range(len(self.routes)):

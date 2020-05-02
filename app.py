@@ -94,7 +94,7 @@ def map():
 
 	my_route = gmap.Directions(origin, dest)
 	my_route.get_route()
-	return(jsonify(my_route.plot_folium()))
+	return(my_route.plot_folium())
     
    
     

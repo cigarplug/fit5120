@@ -1,3 +1,4 @@
+mysql
 gunicorn==20.0.4
 click==7.1.1
 dnspython==1.16.0

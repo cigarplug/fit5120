@@ -9,7 +9,7 @@ from tzinfo import melb_now
 class api:
 
 
-	def __init__(self, lat = None, lon = None, age=None, sex=None):
+	def __init__(self, lat = None, lon = None, age=None, sex=None, kms=5):
 		self.cnx = mysql.connector.connect(user=os.environ["user"],
 								password=os.environ["password"],
 								host=os.environ["host"],
@@ -18,7 +18,7 @@ class api:
 		self.lon = lon
 		self.age = age
 		self.sex = sex
-		self.kms = 5
+		self.kms = kms
 
 
 

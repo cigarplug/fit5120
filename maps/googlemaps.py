@@ -18,6 +18,7 @@ class Place():
 
 
     def search(self, query, qry_type):
+        
         if qry_type == "latLon":
             self.lat = float(query["lat"])
             self.lon = float(query["lon"])
@@ -83,8 +84,10 @@ class Directions(Place):
         #reference: https://stackoverflow.com/questions/12906812/error-can-only-concatenate-list-not-str-to-list
         #reference: https://stackoverflow.com/questions/42964724/pandas-filter-out-column-values-containing-empty-list
         
+        #reference: https://stackoverflow.com/questions/5518435/python-fastest-way-to-create-a-list-of-n-lists
+        
         # insert empty list into "tags" column as placeholder
-        df["tags"] = [[], [], []]
+        df["tags"] = np.empty((df.shape[0], 0)).tolist()
 
         # tag the routes as shortest, fastest, and safest
         df.at[df.loc[df["distance"] == df["distance"].min()].index[0], "tags"] += ["shortest"]

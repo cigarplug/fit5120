@@ -18,7 +18,7 @@ class Place():
 
 
     def search(self, query, qry_type):
-        
+
         if qry_type == "latLon":
             self.lat = float(query["lat"])
             self.lon = float(query["lon"])
@@ -172,7 +172,7 @@ class Map():
                           popup=folium.map.Popup(self.origin.address, show=True)).add_to(route_map)
             
             # destination marker
-            folium.Marker((self.dest.lat, self.dest.lon), tooltip="Origin", 
+            folium.Marker((self.dest.lat, self.dest.lon), tooltip="Destination", 
                           popup=folium.map.Popup(self.dest.address, show = True)).add_to(route_map)
             
             # fix map bounds

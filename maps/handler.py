@@ -14,10 +14,9 @@ def map_handler(content):
 
 		my_dir = Directions(origin, dest)
 		df = my_dir.get_routes()
-		subdf = df.loc[df["tags"].apply(lambda x: content["tags"] in x)].reset_index()
+		subdf = df.loc[df["tags"].apply(lambda x: content["tags"] in x)].reset_index(drop=True)
 
 		my_map = Map(origin, dest, subdf)
-		return my_map.plot_folium()
 
 	else:
 		my_map = Map(origin)

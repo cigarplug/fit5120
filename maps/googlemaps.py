@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from sql.db import query
 from shapely.geometry import Polygon
+from math import ceil
 
 
 
@@ -106,12 +107,11 @@ class Map():
         
         self.origin = origin
         self.dest = dest
+        self.tile = os.environ["mapbox_tile"]
+        self.attr = "MapBox"
         
-        # case when only plotting map for current user locatiom
         if self.dest is None:
             pass
-
-        # case when plotting b/w two points
         else:
             self.polyline = route_df.at[0, "polyline"]
             self.crash_count = route_df.at[0, "crashes"]
@@ -133,11 +133,34 @@ class Map():
         route_bounds = Polygon(self.route_pts).bounds
 
         # bounds calculated from shapely are returned in the (xmin, ymin, xmax, ymax) form
-        # we create [lat, lon] list objects before appending it to the bounds list
+        # we create (lat, lon) tuple objects before appending it to the bounds list
 
         # append to route bounds placeholder
         self.route_bounds.append([route_bounds[0], route_bounds[1]])
         self.route_bounds.append([route_bounds[2], route_bounds[3]])
+        
+        
+    def get_hotspots(self):
+
+        # create a query class object
+        db_query = query()
+
+        crashes = db_query.get_crash_hotspots(self.polyline, limit=ceil(self.distance/1000))
+        
+        # reference: https://stackoverflow.com/questions/35491274/pandas-split-column-of-lists-into-multiple-columns
+        # reference: https://stackoverflow.com/questions/4703390/how-to-extract-a-floating-number-from-a-string
+        # reference: https://stackoverflow.com/questions/20829748/pandas-assigning-multiple-new-columns-simultaneously
+
+        crashes = crashes.assign(lon=None)
+        crashes = crashes.assign(lat=None)
+        
+        crashes[["lon", "lat"]] = crashes["centroid"].str.findall(r'-?\d+\.\d+').to_list()
+        
+        crashes = crashes.drop('centroid', 1)
+        
+        self.hotspots=crashes
+        
+        
         
     
     def plot_folium(self):
@@ -145,8 +168,9 @@ class Map():
         # case when map is being rendered for just the current user coordinates
         if self.dest is None:
             
-            local_map = folium.Map(location=(self.origin.lat, self.origin.lon), 
-                                  zoom_start=15, tiles='OpenStreetMap')
+            local_map = folium.Map(location=(self.origin.lat, self.origin.lon),
+                                   tiles=self.tile,
+                                   zoom_start=15, attr=self.attr)
             
             folium.Marker((self.origin.lat, self.origin.lon), tooltip = "Current Location",
                           popup= folium.map.Popup(self.origin.address, show=True)).add_to(local_map)
@@ -158,11 +182,14 @@ class Map():
             
             # calculate map bounds for supplied routes
             self.calc_route_bounds()
-
+            
             # draw a map centered around mean lat/lon of origin and destination
             route_map = folium.Map(location=[np.mean([self.origin.lat, self.dest.lat]), 
                                            np.mean([self.origin.lon, self.dest.lon])], 
-                                  zoom_start=1, tiles='OpenStreetMap')
+                                  zoom_start=1, 
+                                   tiles=self.tile,
+                                  attr=self.attr
+                                  )
 
             # plot the route
             folium.PolyLine(self.route_pts, opacity = 1).add_to(route_map)
@@ -175,10 +202,20 @@ class Map():
             folium.Marker((self.dest.lat, self.dest.lon), tooltip="Destination", 
                           popup=folium.map.Popup(self.dest.address, show = True)).add_to(route_map)
             
-            # fix map bounds
+            # calculate crash hotspots for route
+            self.get_hotspots()
+            
+            # add hotspots to the map
+            for index, row in self.hotspots.iterrows():
+    
+                folium.CircleMarker(location=[row["lat"], row["lon"]],
+                            radius=row["crash_count"]/4,
+                            fill=True, color = "red").add_to(route_map)
+            
+            # fit route bounds
             route_map.fit_bounds(self.route_bounds)
-
-            return (route_map._repr_html_())
+            
+            return route_map._repr_html_()
 
 		
 

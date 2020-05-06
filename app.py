@@ -39,8 +39,8 @@ def pvt_data(type):
 
 @app.route('/map', methods = [ "POST"])
 def map():
+	
 	content = request.json
-
 
 	return(map_handler(content))
     

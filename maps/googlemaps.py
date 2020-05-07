@@ -7,6 +7,7 @@ import pandas as pd
 from sql.db import query
 from shapely.geometry import Polygon
 from math import ceil
+import time
 
 
 
@@ -107,7 +108,7 @@ class Map():
         
         self.origin = origin
         self.dest = dest
-        self.tile = os.environ["mapbox_tile"]
+        self.tile='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibXNhaW5hbmkiLCJhIjoiY2s5cHdpZmxtMGV3djNmcXMyZjRzdXRidCJ9.itjK6KcxStP2zMEkguKjkA'
         self.attr = "MapBox"
         
         if self.dest is None:
@@ -146,19 +147,22 @@ class Map():
         db_query = query()
 
         crashes = db_query.get_crash_hotspots(self.polyline, limit=ceil(self.distance/1000))
+
         
         # reference: https://stackoverflow.com/questions/35491274/pandas-split-column-of-lists-into-multiple-columns
         # reference: https://stackoverflow.com/questions/4703390/how-to-extract-a-floating-number-from-a-string
         # reference: https://stackoverflow.com/questions/20829748/pandas-assigning-multiple-new-columns-simultaneously
+        
+        # if accidents are found on the route
+        if (crashes.shape[0] != 0):
+            crashes = crashes.assign(lon=None)
+            crashes = crashes.assign(lat=None)
 
-        crashes = crashes.assign(lon=None)
-        crashes = crashes.assign(lat=None)
-        
-        crashes[["lon", "lat"]] = crashes["centroid"].str.findall(r'-?\d+\.\d+').to_list()
-        
-        crashes = crashes.drop('centroid', 1)
-        
-        self.hotspots=crashes
+            crashes[["lon", "lat"]] = crashes["centroid"].str.findall(r'-?\d+\.\d+').to_list()
+
+            crashes = crashes.drop('centroid', 1)
+
+            self.hotspots=crashes
         
         
         
@@ -192,7 +196,14 @@ class Map():
                                   )
 
             # plot the route
-            folium.PolyLine(self.route_pts, opacity = 1).add_to(route_map)
+            folium.PolyLine(self.route_pts, opacity = 1,
+                           popup = folium.map.Popup(
+                               ("Distance: " + 
+                                str(round(self.distance/1000, 1)) +
+                                " Kms\n" + "Travel Time: " + 
+                                str(time.strftime('%H:%M:%S', time.gmtime(self.travel_time)))
+                               ), 
+                               max_width=100, show=True)).add_to(route_map)
             
             # origon marker
             folium.Marker((self.origin.lat, self.origin.lon), tooltip="Origin", 
@@ -206,18 +217,21 @@ class Map():
             self.get_hotspots()
             
             # add hotspots to the map
-            for index, row in self.hotspots.iterrows():
+            # if hotspots are found in database
+            
+            if self.hotspots is not None:
+                for index, row in self.hotspots.iterrows():
     
-                folium.CircleMarker(location=[row["lat"], row["lon"]],
-                            radius=row["crash_count"]/4,
-                            tooltip=str(row["crash_count"]) + " crashes",
-                            fill=True, color = "red").add_to(route_map)
+                    folium.CircleMarker(location=[row["lat"], row["lon"]],
+                                radius=row["crash_count"]/4,
+                                tooltip=str(row["crash_count"]) + " crashes",
+                                fill=True, color = "red").add_to(route_map)
             
             # fit route bounds
             route_map.fit_bounds(self.route_bounds)
             
-            return route_map._repr_html_()
 
+            return route_map._repr_html_()
 		
 
 

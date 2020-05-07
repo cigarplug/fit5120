@@ -146,7 +146,7 @@ class Map():
         # create a query class object
         db_query = query()
 
-        crashes = db_query.get_crash_hotspots(self.polyline, limit=ceil(self.distance/1000))
+        crashes = db_query.get_crash_hotspots(self.polyline, limit=min(10, ceil(self.distance/1000)))
 
         
         # reference: https://stackoverflow.com/questions/35491274/pandas-split-column-of-lists-into-multiple-columns

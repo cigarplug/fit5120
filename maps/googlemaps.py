@@ -113,7 +113,9 @@ class Map():
         
         if self.dest is None:
             pass
+            
         else:
+            # extract values from supplied padas dataframe
             self.polyline = route_df.at[0, "polyline"]
             self.crash_count = route_df.at[0, "crashes"]
             self.travel_time = route_df.at[0, "travel_time"]

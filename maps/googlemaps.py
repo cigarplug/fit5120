@@ -195,15 +195,18 @@ class Map():
                                   attr=self.attr
                                   )
 
+
+            # display text for the route
+            polyline_html = ("Distance: " + 
+                                str(round(self.distance/1000, 1)) +
+                                " Kms<br>" + "Travel Time: " + 
+                                str(time.strftime('%H:%M:%S', time.gmtime(self.travel_time)))
+                               )
+
+
             # plot the route
             folium.PolyLine(self.route_pts, opacity = 1,
-                           popup = folium.map.Popup(
-                               ("Distance: " + 
-                                str(round(self.distance/1000, 1)) +
-                                " Kms\n" + "Travel Time: " + 
-                                str(time.strftime('%H:%M:%S', time.gmtime(self.travel_time)))
-                               ), 
-                               max_width=100, show=True)).add_to(route_map)
+                           popup = folium.map.Popup(polyline_html, max_width=2650)).add_to(route_map)
             
             # origon marker
             folium.Marker((self.origin.lat, self.origin.lon), tooltip="Origin", 
@@ -224,7 +227,7 @@ class Map():
     
                     folium.CircleMarker(location=[row["lat"], row["lon"]],
                                 radius=row["crash_count"]/4,
-                                tooltip=str(row["crash_count"]) + " crashes",
+                                tooltip=str(row["crash_count"]) + " accident events",
                                 fill=True, color = "red").add_to(route_map)
             
             # fit route bounds

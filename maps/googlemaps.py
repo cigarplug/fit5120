@@ -210,6 +210,7 @@ class Map():
     
                 folium.CircleMarker(location=[row["lat"], row["lon"]],
                             radius=row["crash_count"]/4,
+                            tooltip=str(row["crash_count"]) + " crashes",
                             fill=True, color = "red").add_to(route_map)
             
             # fit route bounds

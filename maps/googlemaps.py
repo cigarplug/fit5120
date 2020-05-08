@@ -108,7 +108,7 @@ class Map():
         
         self.origin = origin
         self.dest = dest
-        self.tile='https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibXNhaW5hbmkiLCJhIjoiY2s5cHdpZmxtMGV3djNmcXMyZjRzdXRidCJ9.itjK6KcxStP2zMEkguKjkA'
+        self.tile=os.environ["mapbox_tile"]
         self.attr = "MapBox"
         
         if self.dest is None:

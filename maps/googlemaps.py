@@ -205,11 +205,11 @@ class Map():
             
             # origon marker
             folium.Marker((self.origin.lat, self.origin.lon), tooltip="Origin", 
-                          popup=folium.map.Popup(self.origin.address, show=True)).add_to(route_map)
+                          popup=folium.map.Popup(self.origin.address, max_width=200, show=True)).add_to(route_map)
             
             # destination marker
             folium.Marker((self.dest.lat, self.dest.lon), tooltip="Destination", 
-                          popup=folium.map.Popup(self.dest.address, show = True)).add_to(route_map)
+                          popup=folium.map.Popup(self.dest.address, max_width=200, show = True)).add_to(route_map)
             
             # calculate crash hotspots for route
             self.get_hotspots()
@@ -227,6 +227,7 @@ class Map():
             
             # fit route bounds
             route_map.fit_bounds(self.route_bounds)
+
             
 
             return route_map._repr_html_()

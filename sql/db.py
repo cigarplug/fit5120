@@ -64,7 +64,7 @@ class query:
 	        from
 	            (
 	            select
-	                unnest(ST_ClusterWithin(something.coords, 0.0005)) gc
+	                unnest(ST_ClusterWithin(something.coords, 0.00025)) gc
 	            from
 	                something ) f
 	        order by

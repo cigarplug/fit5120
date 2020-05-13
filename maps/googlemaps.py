@@ -5,7 +5,6 @@ import polyline
 import numpy as np
 import pandas as pd
 from sql.db import query
-from shapely.geometry import Polygon
 from math import ceil
 import time
 
@@ -59,9 +58,17 @@ class Directions(Place):
             (self.origin.lat, self.origin.lon),
             (self.dest.lat, self.dest.lon),
             mode="driving", alternatives=True)
+
+
         
         # placeholder dict for route information: path, travel time, 
         route_lines = {}
+
+
+        # extract map bounds for each route:
+        route_lines["bound_ne"] = [list(x["bounds"]["northeast"].values()) for x in directions_result]
+        route_lines["bound_sw"] = [list(x["bounds"]["southwest"].values()) for x in directions_result]
+
 
         # append the route line from google maps directions result
         route_lines["polyline"] = [each["overview_polyline"]["points"] for each in directions_result]
@@ -125,22 +132,10 @@ class Map():
             self.route_pts = polyline.decode(self.polyline)
 
             # placeholder for storing the route and map bounds 
-            self.route_bounds = []
+            self.route_bounds = [route_df.at[0, "bound_sw"], route_df.at[0, "bound_ne"]]
 
             self.hotspots = None
-    
-    
-    def calc_route_bounds(self):
-        
-        # calculate route bounds
-        route_bounds = Polygon(self.route_pts).bounds
 
-        # bounds calculated from shapely are returned in the (xmin, ymin, xmax, ymax) form
-        # we create (lat, lon) tuple objects before appending it to the bounds list
-
-        # append to route bounds placeholder
-        self.route_bounds.append([route_bounds[0], route_bounds[1]])
-        self.route_bounds.append([route_bounds[2], route_bounds[3]])
         
         
     def get_hotspots(self):
@@ -186,8 +181,6 @@ class Map():
         # case when plotting directions b/w two points
         else:
             
-            # calculate map bounds for supplied routes
-            self.calc_route_bounds()
             
             # draw a map centered around mean lat/lon of origin and destination
             route_map = folium.Map(location=[np.mean([self.origin.lat, self.dest.lat]), 
@@ -234,6 +227,8 @@ class Map():
             
             # fit route bounds
             route_map.fit_bounds(self.route_bounds)
+
+            route_map.save("tmp.html")
             
 
             return route_map._repr_html_()

@@ -59,8 +59,7 @@ class query:
 	            ae.accident_no = t.accident_no )
 	        select
 	            st_numgeometries(gc) as crash_count,
-	            ST_AsText(ST_Centroid(gc)) as centroid,
-	            sqrt(ST_Area(ST_MinimumBoundingCircle(gc)) / pi()) as radius
+	            ST_AsText(ST_Centroid(gc)) as centroid
 	        from
 	            (
 	            select

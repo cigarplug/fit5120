@@ -25,7 +25,8 @@ def map_handler(content):
 	html = my_map.plot_folium()
 
 	# change padding-bottom from 60% to 0%
-	return re.sub("padding-bottom:60%", "padding-bottom:0%", html)
+	# return re.sub("padding-bottom:60%", "padding-bottom:0%", html)
+	return html
 
 		
 

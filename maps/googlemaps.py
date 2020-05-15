@@ -104,6 +104,7 @@ class Directions(Place):
         df.at[df.loc[df["crashes"] == df["crashes"].min()].index[0], "tags"] += ["safest"]
 
 
+        # return routes after removing removing rows where tags are empty
         return df[df['tags'].apply(lambda x: len(x)) > 0]
         
 

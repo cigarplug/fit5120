@@ -38,39 +38,104 @@ class query:
 	    # reference: https://gis.stackexchange.com/questions/269854/understanding-st-clusterwithin
 	    # reference: https://stackoverflow.com/questions/35482754/postgis-clustering-with-other-aggregate
 	    
-	    query = ("""
-	    
-	        with something as (
+	    query = """
+    
+	        with route_pts as (
 	        select
-	            t.coords,
-	            ae.event_type_desc
+	            n.coords coords,
+	            n.accident_no
+	        from
+	            node n
+	        where
+	            st_contains( ST_Buffer( st_linefromencodedpolyline('""" + polyline + """'),
+	            0.0005),
+	            n.coords) ),
+	            
+	        clusters as (
+	        select
+	            unnest(ST_ClusterWithin(route_pts.coords, 0.00025)) gc
+	        from
+	            route_pts
+	        left join accident_event ae on
+	            ae.accident_no = route_pts.accident_no ),
+	            
+	        cluster_info as (
+	        select
+	            gc geom,
+	            st_numgeometries(gc) as crash_count,
+	            ST_AsText(ST_Centroid(gc)) as centroid
+	        from
+	            clusters
+	        order by
+	            st_numgeometries(gc) desc
+	        limit """ + str(limit) + """ ),
+	        
+	        sex as (
+	        select
+	            array_agg(sex) sex,
+	            cluster_info.geom geom,
+	            cluster_info.centroid,
+	            cluster_info.crash_count
 	        from
 	            (
 	            select
 	                n.coords,
-	                n.accident_no
+	                p.sex
 	            from
 	                node n
+	            left join person p on
+	                n.accident_no = p.accident_no
 	            where
-	                st_contains( ST_Buffer( st_linefromencodedpolyline('""" + polyline + """'),
-	                0.0005),
-	                n.coords) ) t
-	        left join accident_event ae on
-	            ae.accident_no = t.accident_no )
+	                sex not in ('',
+	                'U') ) inter_1,
+	            cluster_info
+	        where
+	            st_intersects(cluster_info.geom,
+	            inter_1.coords)
+	        group by
+	            cluster_info.geom,
+	            cluster_info.centroid,
+	            cluster_info.crash_count ),
+	            
+	        vtype as (
 	        select
-	            st_numgeometries(gc) as crash_count,
-	            ST_AsText(ST_Centroid(gc)) as centroid
+	            array_agg(vehicle_type_desc) vehicle_type_desc,
+	            cluster_info.geom geom
 	        from
 	            (
 	            select
-	                unnest(ST_ClusterWithin(something.coords, 0.00025)) gc
+	                n.coords,
+	                v.vehicle_type_desc
 	            from
-	                something ) f
+	                node n
+	            left join vehicle v on
+	                n.accident_no = v.accident_no
+	            where
+	                vehicle_type_desc not in ('Other Vehicle',
+	                'Station Wagon',
+	                'Not Applicable',
+	                'Car',
+	                'Unknown') ) inter_2,
+	            cluster_info
+	        where
+	            st_intersects(cluster_info.geom,
+	            inter_2.coords)
+	        group by
+	            cluster_info.geom )
+	            
+	        select
+	            s.sex,
+	            v.vehicle_type_desc vehicle,
+	            s.crash_count,
+	            s.centroid
+	        from
+	            sex s
+	        left join vtype v on
+	            s.geom = v.geom
 	        order by
-	            st_numgeometries(gc) desc
-	        limit """ + str(limit)
+	            s.crash_count desc
 
-	    )
+    	"""
 	    
 	    return(pd.read_sql(query, self.cnx))
 

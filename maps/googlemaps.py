@@ -135,17 +135,41 @@ class Map():
             # placeholder for storing the route and map bounds 
             self.route_bounds = [route_df.at[0, "bound_sw"], route_df.at[0, "bound_ne"]]
 
-            self.hotspots = None
 
         
+        
+    # function to extract top vehicles involved in crashes
+    def extract_vehicles(self, x):
+    
+        filtered = ["Heavy Vehicle" if v == 'Heavy Vehicle (Rigid) > 4.5 Tonnes' else "Light Commercial Vehicle" if 
+                    v == 'Light Commercial Vehicle (Rigid) <= 4.5 Tonnes GVM' else 
+                    "Trailer" if v == "Prime Mover - Single Trailer"
+                    else v for v in x 
+                    ]
+
+        # count the number of occurence of eact vehicle type
+        top_vehicles = {v: filtered.count(v) for v in set(filtered)}
+
+        # sort, extract top 3
+        top_3 = pd.DataFrame(top_vehicles.items(), columns=['vehicle', 'count']).sort_values(by="count", ascending=False).head(3)["vehicle"]
+
+        return ("Watch out for: " + ", ".join(top_3))
+    
+    
+    # calculate sex ratio from array
+    def sex_ratio(self, x):
+
+        d = {v: x.count(v) for v in set(x)}
+        return str("female/male ratio: " + str(round(d["F"]/d["M"], 1)))
+
+    
         
     def get_hotspots(self):
-
+        
         # create a query class object
         db_query = query()
 
-        crashes = db_query.get_crash_hotspots(self.polyline, limit=min(10, ceil(self.distance/1000)))
-
+        crashes = db_query.get_crash_hotspots(self.polyline, min(10, ceil(self.distance/1000)))
         
         # reference: https://stackoverflow.com/questions/35491274/pandas-split-column-of-lists-into-multiple-columns
         # reference: https://stackoverflow.com/questions/4703390/how-to-extract-a-floating-number-from-a-string
@@ -153,14 +177,28 @@ class Map():
         
         # if accidents are found on the route
         if (crashes.shape[0] != 0):
+            
+            # add vehicles to watch out for
+            crashes["tips"] = crashes["vehicle"].apply(self.extract_vehicles)
+            
+            # add sex ratio
+            crashes["ratio"] = crashes["sex"].apply(self.sex_ratio)
+            
             crashes = crashes.assign(lon=None)
             crashes = crashes.assign(lat=None)
-
+            
+            # split centroid string into lat and lon columns
             crashes[["lon", "lat"]] = crashes["centroid"].str.findall(r'-?\d+\.\d+').to_list()
-
+            
+            # drop redundant columns to free memory
             crashes = crashes.drop('centroid', 1)
-
-            self.hotspots=crashes
+            crashes = crashes.drop('vehicle', 1)
+            crashes = crashes.drop('sex', 1)
+            
+            return crashes
+        
+        else:
+            return None
         
         
         
@@ -190,46 +228,53 @@ class Map():
                                    tiles=self.tile,
                                   attr=self.attr
                                   )
-
-
+            
             # display text for the route
             polyline_html = ("Distance: " + 
                                 str(round(self.distance/1000, 1)) +
                                 " Kms<br>" + "Travel Time: " + 
                                 str(time.strftime('%H:%M:%S', time.gmtime(self.travel_time)))
                                )
-
-
+            
             # plot the route
-            folium.PolyLine(self.route_pts, opacity = 1,
-                           popup = folium.map.Popup(polyline_html, max_width=2650)).add_to(route_map)
+            folium.PolyLine(self.route_pts,
+                           popup = folium.map.Popup(polyline_html,
+                                                    max_width=2650, show=True)).add_to(route_map)
             
             # origon marker
             folium.Marker((self.origin.lat, self.origin.lon), tooltip="Origin", 
-                          popup=folium.map.Popup(self.origin.address, max_width=200, show=True)).add_to(route_map)
+                          popup=folium.map.Popup(self.origin.address, max_width=125, show=True)).add_to(route_map)
             
             # destination marker
             folium.Marker((self.dest.lat, self.dest.lon), tooltip="Destination", 
-                          popup=folium.map.Popup(self.dest.address, max_width=200, show = True)).add_to(route_map)
+                          popup=folium.map.Popup(self.dest.address, max_width=125, show = True)).add_to(route_map)
+            
             
             # calculate crash hotspots for route
-            self.get_hotspots()
+            route_hotspots = self.get_hotspots()
             
-            # add hotspots to the map
+            
             # if hotspots are found in database
+            # add hotspots to the map
             
-            if self.hotspots is not None:
-                for index, row in self.hotspots.iterrows():
-    
+            if route_hotspots is not None:
+                
+                for index, row in route_hotspots.iterrows():
+                    
+                    radius = row["crash_count"]/4
+                    
+                    tooltip_html = (str(row["crash_count"]) + " accident events<br>" +
+                                    row["tips"] + "<br>" +
+                                    row["ratio"])
+                
+                                       
                     folium.CircleMarker(location=[row["lat"], row["lon"]],
-                                radius=row["crash_count"]/4,
-                                tooltip=str(row["crash_count"]) + " accident events",
+                                radius=radius,
+                                tooltip=folium.map.Tooltip(tooltip_html),
                                 fill=True, color = "red").add_to(route_map)
             
             # fit route bounds
             route_map.fit_bounds(self.route_bounds)
-
-            
 
             return route_map._repr_html_()
 		

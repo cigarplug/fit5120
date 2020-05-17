@@ -1,5 +1,5 @@
 from maps.googlemaps import Place, Directions, Map
-import re
+# import re
 
 def map_handler(content):
 
@@ -26,6 +26,7 @@ def map_handler(content):
 
 	# change padding-bottom from 60% to 0%
 	# return re.sub("padding-bottom:60%", "padding-bottom:0%", html)
+
 	return html
 
 		

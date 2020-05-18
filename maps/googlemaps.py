@@ -215,12 +215,51 @@ class Map():
             
             local_map = folium.Map(location=(self.origin.lat, self.origin.lon),
                                    tiles=self.tile,
-                                   zoom_start=15, attr=self.attr)
+                                   zoom_start=13, attr=self.attr)
             
             folium.Marker((self.origin.lat, self.origin.lon), tooltip = "Current Location",
                           popup= folium.map.Popup(self.origin.address, show=True)).add_to(local_map)
             
+            
+            db_query = query()
+
+            heat_data = db_query.get_heat_data(self.origin.lat, self.origin.lon)
+            
+            if heat_data.shape[0] != 0:
+                heat_data = heat_data.assign(lon=None)
+                heat_data = heat_data.assign(lat=None)
+            
+                # split centroid string into lat and lon columns
+                heat_data[["lon", "lat"]] = heat_data["centroid"].str.findall(r'-?\d+\.\d+').to_list()
+                
+                # add vehicles to watch out for
+                heat_data["tips"] = heat_data["vehicle"].apply(self.extract_vehicles)
+                
+                heat_data = heat_data.drop('centroid', 1)
+                heat_data = heat_data.drop('vehicle', 1)
+                
+                folium.CircleMarker(location=[self.origin.lat, self.origin.lon],
+                                radius=200,
+                                fill=False, color = "blue").add_to(local_map)
+                
+                
+                for index, row in heat_data.iterrows():
+                    
+                    radius = row["crash_count"]/4
+                    
+                    tooltip_html = (str(row["crash_count"]) + " accident events<br>" +
+                                    row["tips"] )
+                
+                                       
+                    folium.CircleMarker(location=[row["lat"], row["lon"]],
+                                radius=radius,
+                                tooltip=folium.map.Tooltip(tooltip_html),
+                                fill=True, color = "red").add_to(local_map)
+            
+
             return local_map._repr_html_()
+
+
          
         # case when plotting directions b/w two points
         else:

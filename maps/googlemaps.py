@@ -141,19 +141,24 @@ class Map():
     # function to extract top vehicles involved in crashes
     def extract_vehicles(self, x):
     
-        filtered = ["Heavy Vehicle" if v == 'Heavy Vehicle (Rigid) > 4.5 Tonnes' else "Light Commercial Vehicle" if 
+        if x is not None:
+            filtered = ["Heavy Vehicle" if v == 'Heavy Vehicle (Rigid) > 4.5 Tonnes' else "Light Commercial Vehicle" if 
                     v == 'Light Commercial Vehicle (Rigid) <= 4.5 Tonnes GVM' else 
-                    "Trailer" if v == "Prime Mover - Single Trailer"
+                    "Single Trailer Truck" if v == "Prime Mover - Single Trailer"
                     else v for v in x 
                     ]
 
-        # count the number of occurence of eact vehicle type
-        top_vehicles = {v: filtered.count(v) for v in set(filtered)}
+            # count the number of occurence of eact vehicle type
+            top_vehicles = {v: filtered.count(v) for v in set(filtered)}
 
-        # sort, extract top 3
-        top_3 = pd.DataFrame(top_vehicles.items(), columns=['vehicle', 'count']).sort_values(by="count", ascending=False).head(3)["vehicle"]
+            # sort, extract top 3
+            top_3 = pd.DataFrame(top_vehicles.items(), columns=['vehicle', 'count']).sort_values(by="count", ascending=False).head(3)["vehicle"]
 
-        return ("Watch out for: " + ", ".join(top_3))
+            return ("Watch out for: " + ", ".join(top_3))
+        
+        else:
+            return ("Watch out for:")
+            
     
     
     # calculate sex ratio from array

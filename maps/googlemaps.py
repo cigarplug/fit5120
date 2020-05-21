@@ -322,8 +322,7 @@ class Map():
             
             # fit route bounds
             route_map.fit_bounds(self.route_bounds)
-
-            route_map.save("w00t.html")
+            
 
             return route_map._repr_html_()
 		

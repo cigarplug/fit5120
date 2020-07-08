@@ -2,7 +2,9 @@
 # Data processing backend for the FIT5120 Capstone Project
 
 This is the back-end program for of our project titled: Reducing
-Transport Injuries - Fighting Fatigue It is developed using the Flask
+Transport Injuries - Fighting Fatigue
+
+It is developed using the Flask
 web framework.
 
 ## Features

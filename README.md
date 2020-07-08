@@ -51,14 +51,13 @@ mapbox_tile : url and access key from your MapBox account
 $ heroku local
 ```
 
-To deploy the application, (in your app directory) run:
+→ To deploy the application, (in your app directory) run:
 
 ``` r
 $ git push heroku master
 ```
 
-The application is now deployed. Ensure that at least one instance of
-the app is running:
+→ The application is now deployed. Ensure that at least one instance of the app is running:
 
 ``` r
 $ heroku ps:scale web=1

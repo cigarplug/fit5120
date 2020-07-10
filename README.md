@@ -9,7 +9,7 @@ View the product video for this project:
 
 [![product video](https://img.youtube.com/vi/9ksR8vJijpg/3.jpg)](https://www.youtube.com/watch?v=9ksR8vJijpg "Fighting Fatigue")
 
-https://www.youtube.com/watch?v=9ksR8vJijpg
+
 
 ## Features
 

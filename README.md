@@ -5,7 +5,11 @@ This is the back-end program for of our project titled: Reducing Transport Injur
 
 It is developed using the Flask web framework.
 
-View the product video for this project: https://www.youtube.com/watch?v=9ksR8vJijpg
+View the product video for this project: 
+
+[![product video](https://img.youtube.com/vi/9ksR8vJijpg/3.jpg)](https://www.youtube.com/watch?v=9ksR8vJijpg "Fighting Fatigue")
+
+https://www.youtube.com/watch?v=9ksR8vJijpg
 
 ## Features
 
